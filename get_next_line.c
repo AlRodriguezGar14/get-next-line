@@ -53,13 +53,19 @@ char *read_file(int fd)
 int	main(void)
 {
 	char	*filename = "lorem.txt";
-	char	*buffer_content;
+	char	*next_line;
 	int		fd = open(filename, O_RDONLY);
 	if (fd == -1)
 		return (fd);
 
-	buffer_content = read_file(fd);
-	printf("%s", buffer_content);
+	while (1)
+	{
+		next_line = read_file(fd);
+		if (next_line == NULL)
+			break ;
+		printf("%s", next_line);
+		free(next_line);
+	}
 
 	close(fd);
 	return (0);
