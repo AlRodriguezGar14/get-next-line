@@ -25,7 +25,6 @@ TODO:
 		read, malloc, free.
 */
 
-// #define BUFFER_SIZE 4092
 # ifndef BUFFER_SIZE
 #	define BUFFER_SIZE 42
 # endif
@@ -74,47 +73,6 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 	return (len);
 }
 
-char *read_file(int fd)
-{
-    int bytes_read;
-    char *buffer;
-	int	idx;
-
-    buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
-
-	idx = 0;
-    while (idx < BUFFER_SIZE - 1)
-    {
-        bytes_read = read(fd, &buffer[idx], 1);
-        if (bytes_read <= 0)
-        {
-            free(buffer);
-            return NULL;
-        }
-		if (buffer[idx] == '\n')
-		{
-			idx++;
-			break;
-		}
-        idx++;
-    }
-    buffer[idx] = '\0';
-    return buffer;
-}
-
-
-size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
-{
-	size_t	idx;
-	size_t	ret;
-
-	idx = -1;
-	while (++idx < dstsize && *dst)
-		dst++;
-	ret = ft_strlcpy(dst, src, dstsize - idx);
-	return (ret + idx);
-}
-
 void	*ft_memset(void *buffer, int val, size_t len)
 {
 	unsigned char	*p;
@@ -138,6 +96,33 @@ void	*ft_calloc(size_t count, size_t size)
 	return (allocated);
 }
 
+char *read_file(int fd)
+{
+    int bytes_read;
+    char *buffer;
+	int	idx;
+
+    buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+
+	idx = 0;
+    while (idx < BUFFER_SIZE)
+    {
+        bytes_read = read(fd, &buffer[idx], 1);
+        if (bytes_read <= 0)
+        {
+            free(buffer);
+            return NULL;
+        }
+		if (buffer[idx] == '\n')
+			break;
+        idx++;
+    }
+	// printf("%s", buffer);
+    return buffer;
+}
+
+
+
 char *append_line(char *line, char *next_line)
 {
     char *new_line;
@@ -149,16 +134,16 @@ char *append_line(char *line, char *next_line)
     if (next_line)
         len_next_line = ft_strlen(next_line);
 
-    new_line = ft_calloc((len_line + len_next_line + 1), sizeof(char));
+    new_line = ft_calloc((len_line + len_next_line + 2), sizeof(char));
 	
     if (line)
     {
-		ft_strlcat(new_line, line, len_line + len_next_line);
+		ft_strlcpy(new_line, line, len_line + 1);
         free(line);
     }
     if (next_line)
     {
-		ft_strlcat(new_line + len_line, next_line, len_line + len_next_line);
+		ft_strlcpy(new_line + len_line, next_line, len_next_line + 1);
         free(next_line);
     }
     return (new_line);
@@ -181,22 +166,22 @@ char *get_next_line(int fd)
 	return (line);
 }
 
-int main(void)
-{
-    char	*filename = "lorem.txt";
-	char	*line = NULL;
-    int fd = open(filename, O_RDONLY);
-    if (fd == -1)
-        return (fd);
-
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		printf("%s\n", line);
-		free(line);
-	}
-    close(fd);
-    return (0);
-}
+// int main(void)
+// {
+//     char	*filename = "lorem.txt";
+// 	char	*line = NULL;
+//     int fd = open(filename, O_RDONLY);
+//     if (fd == -1)
+//         return (fd);
+//
+// 	while (1)
+// 	{
+// 		line = get_next_line(fd);
+// 		if (line == NULL)
+// 			break ;
+// 		printf("%s\n", line);
+// 		free(line);
+// 	}
+//     close(fd);
+//     return (0);
+// }
