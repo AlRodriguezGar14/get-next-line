@@ -164,14 +164,10 @@ char *append_line(char *line, char *next_line)
     return (new_line);
 }
 
-int main(void)
+char *get_next_line(int fd)
 {
-    char *filename = "lorem.txt";
     char *next_line;
     char *line = NULL;
-    int fd = open(filename, O_RDONLY);
-    if (fd == -1)
-        return (fd);
 
     while (1)
     {
@@ -182,9 +178,19 @@ int main(void)
         if (ft_strchr(line, '\n'))
             break;
     }
+	return (line);
+}
 
-    printf("%s", line);
-    printf("\n");
+int main(void)
+{
+    char	*filename = "lorem.txt";
+	char	*line = NULL;
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1)
+        return (fd);
+
+	line = get_next_line(fd);
+	printf("%s", line);
     free(line);
     close(fd);
     return (0);
