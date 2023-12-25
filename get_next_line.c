@@ -43,9 +43,11 @@ char *read_file(int fd)
 	buffer = malloc(BUFFER_SIZE * sizeof(char));
 	bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
 	if (bytes_read <= 0)
+	{
+		free(buffer);
 		return (NULL);
-	buffer[BUFFER_SIZE] = '\0';
-
+	}
+	buffer[bytes_read] = '\0';
 	return (buffer);
 }
 
@@ -62,11 +64,14 @@ int	main(void)
 	{
 		next_line = read_file(fd);
 		if (next_line == NULL)
+		{
+			free(next_line);
 			break ;
+		}
 		printf("%s", next_line);
 		free(next_line);
+		next_line = NULL;
 	}
-
 	close(fd);
 	return (0);
 }
