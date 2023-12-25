@@ -189,9 +189,14 @@ int main(void)
     if (fd == -1)
         return (fd);
 
-	line = get_next_line(fd);
-	printf("%s", line);
-    free(line);
+	while (1)
+	{
+		line = get_next_line(fd);
+		if (line == NULL)
+			break ;
+		printf("%s\n", line);
+		free(line);
+	}
     close(fd);
     return (0);
 }
