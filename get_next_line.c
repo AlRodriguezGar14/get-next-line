@@ -6,7 +6,7 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/23 14:02:54 by alberrod         ###   ########.fr       */
+/*   Updated: 2023/12/27 21:22:47 by alberrod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,20 @@ size_t	ft_strlen(const char *str)
 	while (str[idx] != 0)
 		idx++;
 	return (idx);
+}
+
+void	*ft_memcpy(void *dest, const void *src, size_t n)
+{
+	unsigned char		*char_dest;
+	const unsigned char	*char_src;
+
+	if (dest == NULL && src == NULL)
+		return (NULL);
+	char_dest = (unsigned char *)dest;
+	char_src = (const unsigned char *)src;
+	while (n--)
+		*char_dest++ = *char_src++;
+	return (dest);
 }
 
 char	*ft_strchr(const char *str, int c)
@@ -96,92 +110,127 @@ void	*ft_calloc(size_t count, size_t size)
 	return (allocated);
 }
 
-char *read_file(int fd)
+char	*ft_strdup(const char *str1)
 {
-    int bytes_read;
-    char *buffer;
-	int	idx;
+	int		len;
+	char	*out;
 
-    buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-
-	idx = 0;
-    while (idx < BUFFER_SIZE)
-    {
-        bytes_read = read(fd, &buffer[idx], 1);
-        if (bytes_read <= 0)
-        {
-            free(buffer);
-            return NULL;
-        }
-		if (buffer[idx] == '\n')
-			break;
-        idx++;
-    }
-	// printf("%s", buffer);
-    return buffer;
+	len = ft_strlen(str1) + 1;
+	out = ft_calloc(len, sizeof(char));
+	if (out == NULL)
+		return (NULL);
+	ft_memcpy(out, (char *)str1, len);
+	return (out);
 }
 
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t	total_len;
+	size_t	len_s1;
+	size_t	len_s2;
+	char	*output;
+
+	if (!s1)
+		return (NULL);
+	len_s1 = ft_strlen(s1);
+	len_s2 = ft_strlen(s2);
+	total_len = len_s1 + len_s2 + 1;
+	output = (char *)ft_calloc(total_len, sizeof(char));
+	if (output == NULL)
+		return (NULL);
+	ft_memcpy(output, (char *)s1, len_s1);
+	ft_memcpy(output + len_s1, (char *)s2, len_s2);
+	return (output);
+}
 
 
 char *append_line(char *line, char *next_line)
 {
     char *new_line;
-    size_t len_line = 0;
-    size_t len_next_line = 0;
+    size_t len_line;
+    size_t len_next_line;
 
+	len_line = 0;
+	len_next_line = 0;
     if (line)
         len_line = ft_strlen(line);
     if (next_line)
         len_next_line = ft_strlen(next_line);
-
-    new_line = ft_calloc((len_line + len_next_line + 2), sizeof(char));
-	
+    new_line = ft_calloc((len_line + len_next_line + 1), sizeof(char));
+	if (!new_line)
+		return (NULL);
     if (line)
-    {
-		ft_strlcpy(new_line, line, len_line + 1);
-        free(line);
-    }
+		ft_memcpy(new_line, line, len_line);
     if (next_line)
-    {
-		ft_strlcpy(new_line + len_line, next_line, len_next_line + 1);
-        free(next_line);
-    }
+		ft_memcpy(new_line + len_line, next_line, len_next_line);
+	new_line[len_line + len_next_line] = '\0';
     return (new_line);
 }
 
+char *read_file(int fd)
+{
+    static char	buffer[BUFFER_SIZE + 1];
+    char		*line = NULL;
+	char		*tmp;
+    ssize_t		bytes_read;
+
+    while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
+    {
+        buffer[bytes_read] = '\0';
+        if (line == NULL)
+            line = ft_strdup(buffer);
+        else
+		{
+			tmp = ft_strjoin(line, buffer);
+			free(line);
+			line = tmp;
+		}
+        if (ft_strchr(buffer, '\n'))
+            break;
+    }
+    return (line);
+}
+
+
 char *get_next_line(int fd)
 {
-    char *next_line;
-    char *line = NULL;
+    char	*next_line;
+    char 	*line = NULL;
+	char	*tmp;
 
     while (1)
     {
         next_line = read_file(fd);
         if (next_line == NULL)
             break;
-        line = append_line(line, next_line);
+        tmp = append_line(line, next_line);
+		free(line);
+		free(next_line);
+		line = tmp;
         if (ft_strchr(line, '\n'))
             break;
     }
 	return (line);
 }
 
-// int main(void)
-// {
-//     char	*filename = "lorem.txt";
-// 	char	*line = NULL;
-//     int fd = open(filename, O_RDONLY);
-//     if (fd == -1)
-//         return (fd);
-//
-// 	while (1)
-// 	{
-// 		line = get_next_line(fd);
-// 		if (line == NULL)
-// 			break ;
-// 		printf("%s\n", line);
-// 		free(line);
-// 	}
-//     close(fd);
-//     return (0);
-// }
+int main(void)
+{
+    char	*filename = "lorem.txt";
+	char	*line = NULL;
+    int fd = open(filename, O_RDONLY);
+	int	count = 0;
+    if (fd == -1)
+        return (fd);
+
+	while (1)
+	{
+		line = get_next_line(fd);
+		if (line == NULL)
+			break ;
+		printf("line[%d]: %s", count, line);
+		count++;
+		free(line);
+	}
+    close(fd);
+    return (0);
+}
