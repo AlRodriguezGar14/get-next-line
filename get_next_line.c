@@ -6,7 +6,7 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/27 21:22:47 by alberrod         ###   ########.fr       */
+/*   Updated: 2023/12/27 23:02:57 by alberrod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,24 +170,35 @@ char *append_line(char *line, char *next_line)
 char *read_file(int fd)
 {
     static char	buffer[BUFFER_SIZE + 1];
+	static int	start = 0;
+	static int	end = 0;
     char		*line = NULL;
-	char		*tmp;
-    ssize_t		bytes_read;
-
-    while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
-    {
-        buffer[bytes_read] = '\0';
-        if (line == NULL)
-            line = ft_strdup(buffer);
-        else
-		{
-			tmp = ft_strjoin(line, buffer);
-			free(line);
-			line = tmp;
-		}
-        if (ft_strchr(buffer, '\n'))
-            break;
+	int			idx;
+	if (start >= end)
+	{
+		end = read(fd, buffer, BUFFER_SIZE);
+		if (end <= 0)
+			return (NULL);
+		start = 0;
     }
+	// printf("buff: %s", buffer);
+	idx = start;
+	while (idx < end)
+	{
+		if (buffer[idx++] == '\n')
+			break ;
+	}
+
+	line = ft_calloc(idx - start + 1, sizeof(char));
+	ft_memcpy(line, buffer + start, idx - start);
+	start = idx+1;
+	// printf("\n===============\n");
+	// printf("\nbuffer: %s", buffer);
+	// printf("\nline: %s", line);
+	// printf("\nstart: %d", start);
+	// printf("\nend: %d", end);
+	// printf("\nidx: %d\n", idx);
+	// printf("\n===============\n");
     return (line);
 }
 
@@ -228,6 +239,7 @@ int main(void)
 		if (line == NULL)
 			break ;
 		printf("line[%d]: %s", count, line);
+		// printf("\n");
 		count++;
 		free(line);
 	}
