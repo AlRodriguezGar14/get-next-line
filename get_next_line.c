@@ -6,7 +6,7 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/27 23:02:57 by alberrod         ###   ########.fr       */
+/*   Updated: 2023/12/27 23:08:24 by alberrod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,7 +191,7 @@ char *read_file(int fd)
 
 	line = ft_calloc(idx - start + 1, sizeof(char));
 	ft_memcpy(line, buffer + start, idx - start);
-	start = idx+1;
+	start = idx;
 	// printf("\n===============\n");
 	// printf("\nbuffer: %s", buffer);
 	// printf("\nline: %s", line);
@@ -238,7 +238,8 @@ int main(void)
 		line = get_next_line(fd);
 		if (line == NULL)
 			break ;
-		printf("line[%d]: %s", count, line);
+		printf("%s", line);
+		// printf("line[%d]: %s", count, line);
 		// printf("\n");
 		count++;
 		free(line);
