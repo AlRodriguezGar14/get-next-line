@@ -6,7 +6,7 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/28 01:11:55 by alberrod         ###   ########.fr       */
+/*   Updated: 2023/12/28 05:06:16 by alberrod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ char	*read_file(int fd)
 	char		*line;
 	int			idx;
 
-	line = NULL;
 	if (start >= end)
 	{
 		end = read(fd, buffer, BUFFER_SIZE);
@@ -76,6 +75,8 @@ char	*get_next_line(int fd)
 		if (next_line == NULL)
 			break ;
 		tmp = append_line(line, next_line);
+		if (!tmp)
+			break ;
 		free(line);
 		free(next_line);
 		line = tmp;
@@ -87,7 +88,11 @@ char	*get_next_line(int fd)
 
 // int	main(void)
 // {
-// 	char *filename = "lorem.txt";
+// 	// char *filename = "lorem.txt";
+// 	// char *filename = "large_file.txt";
+// 	// char *filename = "very_long_line.txt";
+// 	// char *filename = "null.txt";
+// 	char *filename = "nonullend.txt";
 // 	char *line = NULL;
 // 	int fd = open(filename, O_RDONLY);
 // 	int count = 0;
