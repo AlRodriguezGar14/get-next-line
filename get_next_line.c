@@ -6,11 +6,25 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/28 05:06:16 by alberrod         ###   ########.fr       */
+/*   Updated: 2023/12/30 16:55:30 by alberrod         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t	idx;
+	int		lexicographic_return;
+
+	idx = -1;
+	if (!n)
+		return (0);
+	while (++idx < n - 1 && s1[idx] == s2[idx] && s1[idx])
+		;
+	lexicographic_return = ((unsigned char)s1[idx] - (unsigned char)s2[idx]);
+	return (lexicographic_return);
+}
 
 char	*append_line(char *line, char *next_line)
 {
@@ -37,17 +51,19 @@ char	*append_line(char *line, char *next_line)
 
 char	*read_file(int fd)
 {
-	static char	buffer[BUFFER_SIZE + 1];
 	static int	start = 0;
 	static int	end = 0;
 	char		*line;
 	int			idx;
+	static char	buffer[BUFFER_SIZE + 1];
 
 	if (start >= end)
 	{
 		end = read(fd, buffer, BUFFER_SIZE);
-		if (end <= 0)
+		if (end == 0)
 			return (NULL);
+		if (end == -1)
+			return ("ERROR");
 		start = 0;
 	}
 	idx = start;
@@ -74,6 +90,11 @@ char	*get_next_line(int fd)
 		next_line = read_file(fd);
 		if (next_line == NULL)
 			break ;
+		if (ft_strncmp(next_line, "ERROR", ft_strlen("ERROR")) == 0)
+		{
+			free(line);
+			return (NULL);
+		}
 		tmp = append_line(line, next_line);
 		if (!tmp)
 			break ;
