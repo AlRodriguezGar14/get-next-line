@@ -6,7 +6,7 @@
 /*   By: alberrod <alberrod@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/23 14:02:51 by alberrod          #+#    #+#             */
-/*   Updated: 2023/12/30 16:55:30 by alberrod         ###   ########.fr       */
+/*   Updated: 2024/01/02 18:10:16 by rde-mour         ###   ########.org.br   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,11 +68,11 @@ char	*read_file(int fd)
 	}
 	idx = start;
 	while (idx < end)
-	{
 		if (buffer[idx++] == '\n')
 			break ;
-	}
 	line = ft_calloc(idx - start + 1, sizeof(char));
+	if (!line)
+		return ("ERROR");
 	ft_memcpy(line, buffer + start, idx - start);
 	start = idx;
 	return (line);
@@ -96,10 +96,10 @@ char	*get_next_line(int fd)
 			return (NULL);
 		}
 		tmp = append_line(line, next_line);
-		if (!tmp)
-			break ;
 		free(line);
 		free(next_line);
+		if (!tmp)
+			return (NULL);
 		line = tmp;
 		if (ft_strchr(line, '\n'))
 			break ;
